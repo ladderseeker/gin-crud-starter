@@ -40,11 +40,14 @@ CREATE USER postgres WITH ENCRYPTED PASSWORD 'postgres';
 GRANT ALL PRIVILEGES ON DATABASE gin_crud TO postgres;
 \q
 ```
-```
+```bash
 # Configure and run application
 # Create .env file with DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
 go mod download
 go run cmd/api/main.go
+
+# Seed test data
+go run cmd/seed/main.go
 ```
 
 ## API Endpoints
@@ -58,7 +61,7 @@ go run cmd/api/main.go
 
 ## Test Data
 
-run this SQL:
+Use the seed utility or run this SQL:
 
 ```sql
 TRUNCATE TABLE users RESTART IDENTITY CASCADE;
