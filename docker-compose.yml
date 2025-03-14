@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: gin-crud-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      - SERVER_PORT=8080
+      - GIN_MODE=release
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=gin_crud
+      - DB_SSLMODE=disable
+      - LOG_LEVEL=info
+    networks:
+      - gin-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  postgres:
+    container_name: gin-crud-postgres
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=gin_crud
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - gin-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+networks:
+  gin-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
