@@ -23,7 +23,7 @@ A simple RESTful API starter with Gin, GORM, and PostgreSQL featuring clean arch
 docker-compose up -d
 
 # Seed test data
-docker exec -it gin-crud-api go run cmd/seed/main.go
+docker exec -it gin-crud-server go run cmd/seed/main.go
 ```
 
 ### Option 2: Local Setup
@@ -44,7 +44,7 @@ GRANT ALL PRIVILEGES ON DATABASE gin_crud TO postgres;
 # Configure and run application
 # Create .env file with DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
 go mod download
-go run cmd/api/main.go
+go run cmd/server/main.go
 
 # Seed test data
 go run cmd/seed/main.go

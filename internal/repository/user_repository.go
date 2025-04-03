@@ -1,38 +1,38 @@
-package repositories
+package repository
 
 import (
 	"context"
-	"github.com/ladderseeker/gin-crud-starter/internal/pkg/errors"
+	"github.com/ladderseeker/gin-crud-starter/internal/model"
+	"github.com/ladderseeker/gin-crud-starter/pkg/errors"
 
-	"github.com/ladderseeker/gin-crud-starter/internal/domain/entities"
 	"gorm.io/gorm"
 )
 
 // UserRepository defines the interface for user repository
 type UserRepository interface {
-	FindAll(ctx context.Context) ([]entities.User, error)
-	FindByID(ctx context.Context, id uint) (*entities.User, error)
-	FindByEmail(ctx context.Context, email string) (*entities.User, error)
-	Create(ctx context.Context, user *entities.User) error
-	Update(ctx context.Context, user *entities.User) error
+	FindAll(ctx context.Context) ([]model.User, error)
+	FindByID(ctx context.Context, id uint) (*model.User, error)
+	FindByEmail(ctx context.Context, email string) (*model.User, error)
+	Create(ctx context.Context, user *model.User) error
+	Update(ctx context.Context, user *model.User) error
 	Delete(ctx context.Context, id uint) error
 }
 
-// userRepository implements the UserRepository interface
-type userRepository struct {
+// userRepositoryImpl implements the UserRepository interface
+type userRepositoryImpl struct {
 	db *gorm.DB
 }
 
 // NewUserRepository creates a new user repository
 func NewUserRepository(db *gorm.DB) UserRepository {
-	return &userRepository{
+	return &userRepositoryImpl{
 		db: db,
 	}
 }
 
 // FindAll retrieves all users
-func (r *userRepository) FindAll(ctx context.Context) ([]entities.User, error) {
-	var users []entities.User
+func (r *userRepositoryImpl) FindAll(ctx context.Context) ([]model.User, error) {
+	var users []model.User
 	result := r.db.WithContext(ctx).Find(&users)
 	if result.Error != nil {
 		return nil, errors.NewDatabaseError("Failed to retrieve users", result.Error)
@@ -41,8 +41,8 @@ func (r *userRepository) FindAll(ctx context.Context) ([]entities.User, error) {
 }
 
 // FindByID retrieves a user by ID
-func (r *userRepository) FindByID(ctx context.Context, id uint) (*entities.User, error) {
-	var user entities.User
+func (r *userRepositoryImpl) FindByID(ctx context.Context, id uint) (*model.User, error) {
+	var user model.User
 	result := r.db.WithContext(ctx).First(&user, id)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
@@ -54,8 +54,8 @@ func (r *userRepository) FindByID(ctx context.Context, id uint) (*entities.User,
 }
 
 // FindByEmail retrieves a user by email
-func (r *userRepository) FindByEmail(ctx context.Context, email string) (*entities.User, error) {
-	var user entities.User
+func (r *userRepositoryImpl) FindByEmail(ctx context.Context, email string) (*model.User, error) {
+	var user model.User
 	result := r.db.WithContext(ctx).Where("email = ?", email).First(&user)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
@@ -67,7 +67,7 @@ func (r *userRepository) FindByEmail(ctx context.Context, email string) (*entiti
 }
 
 // Create creates a new user
-func (r *userRepository) Create(ctx context.Context, user *entities.User) error {
+func (r *userRepositoryImpl) Create(ctx context.Context, user *model.User) error {
 	// Check if user with the same email already exists
 	existingUser, err := r.FindByEmail(ctx, user.Email)
 	if err == nil && existingUser != nil {
@@ -83,7 +83,7 @@ func (r *userRepository) Create(ctx context.Context, user *entities.User) error 
 }
 
 // Update updates a user
-func (r *userRepository) Update(ctx context.Context, user *entities.User) error {
+func (r *userRepositoryImpl) Update(ctx context.Context, user *model.User) error {
 	result := r.db.WithContext(ctx).Save(&user)
 	if result.Error != nil {
 		return errors.NewDatabaseError("Failed to update user", result.Error)
@@ -95,8 +95,8 @@ func (r *userRepository) Update(ctx context.Context, user *entities.User) error 
 }
 
 // Delete deletes a user
-func (r *userRepository) Delete(ctx context.Context, id uint) error {
-	result := r.db.WithContext(ctx).Delete(&entities.User{}, id)
+func (r *userRepositoryImpl) Delete(ctx context.Context, id uint) error {
+	result := r.db.WithContext(ctx).Delete(&model.User{}, id)
 	if result.Error != nil {
 		return errors.NewDatabaseError("Failed to delete user", result.Error)
 	}

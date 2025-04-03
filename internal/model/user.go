@@ -1,4 +1,4 @@
-package entities
+package model
 
 import (
 	"time"
@@ -19,12 +19,10 @@ type User struct {
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
-// TableName overrides the table name
-func (User) TableName() string {
+func (*User) TableName() string {
 	return "users"
 }
 
-// UserCreate represents the structure for creating a user
 type UserCreate struct {
 	Name     string `json:"name" binding:"required"`
 	Email    string `json:"email" binding:"required,email"`
@@ -32,7 +30,6 @@ type UserCreate struct {
 	Role     string `json:"role" binding:"omitempty,oneof=admin user"`
 }
 
-// UserUpdate represents the structure for updating a user
 type UserUpdate struct {
 	Name     *string `json:"name" binding:"omitempty"`
 	Email    *string `json:"email" binding:"omitempty,email"`
@@ -41,7 +38,6 @@ type UserUpdate struct {
 	Active   *bool   `json:"active" binding:"omitempty"`
 }
 
-// UserResponse represents the response structure for a user
 type UserResponse struct {
 	ID        uint      `json:"id"`
 	Name      string    `json:"name"`
@@ -52,7 +48,6 @@ type UserResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// ToResponse converts a User to UserResponse
 func (u *User) ToResponse() UserResponse {
 	return UserResponse{
 		ID:        u.ID,

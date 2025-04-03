@@ -1,7 +1,9 @@
-package api
+package main
 
 import (
 	"context"
+	"github.com/ladderseeker/gin-crud-starter/internal/router"
+	"github.com/ladderseeker/gin-crud-starter/pkg/logger"
 	"net/http"
 	"os"
 	"os/signal"
@@ -9,9 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ladderseeker/gin-crud-starter/configs"
-	"github.com/ladderseeker/gin-crud-starter/internal/api/routes"
-	"github.com/ladderseeker/gin-crud-starter/internal/pkg/logger"
+	"github.com/ladderseeker/gin-crud-starter/config"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -19,20 +19,20 @@ import (
 // Server represents the HTTP server
 type Server struct {
 	router *gin.Engine
-	config *configs.Config
+	config *config.Config
 	db     *gorm.DB
 }
 
 // NewServer creates a new server instance
-func NewServer(config *configs.Config, db *gorm.DB) *Server {
+func NewServer(config *config.Config, db *gorm.DB) *Server {
 	// Set Gin mode
 	gin.SetMode(config.Server.Mode)
 
-	// Create router
-	router := gin.New()
+	// Create rt
+	rt := gin.New()
 
 	return &Server{
-		router: router,
+		router: rt,
 		config: config,
 		db:     db,
 	}
@@ -40,8 +40,8 @@ func NewServer(config *configs.Config, db *gorm.DB) *Server {
 
 // Start starts the server
 func (s *Server) Start() error {
-	// Setup routes
-	routes.SetupRoutes(s.router, s.db)
+	// Setup router
+	router.SetupRoutes(s.router, s.db)
 
 	// Create HTTP server
 	srv := &http.Server{

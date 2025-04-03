@@ -1,48 +1,48 @@
-package services
+package service
 
 import (
 	"context"
 	"errors"
+	"github.com/ladderseeker/gin-crud-starter/internal/model"
+	apperrors "github.com/ladderseeker/gin-crud-starter/pkg/errors"
 	"testing"
 
-	"github.com/ladderseeker/gin-crud-starter/internal/domain/entities"
-	apperrors "github.com/ladderseeker/gin-crud-starter/internal/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-// MockUserRepository is a mock implementation of repositories.UserRepository
+// MockUserRepository is a mock implementation of repository.UserRepository
 type MockUserRepository struct {
 	mock.Mock
 }
 
-func (m *MockUserRepository) FindAll(ctx context.Context) ([]entities.User, error) {
+func (m *MockUserRepository) FindAll(ctx context.Context) ([]model.User, error) {
 	args := m.Called(ctx)
-	return args.Get(0).([]entities.User), args.Error(1)
+	return args.Get(0).([]model.User), args.Error(1)
 }
 
-func (m *MockUserRepository) FindByID(ctx context.Context, id uint) (*entities.User, error) {
+func (m *MockUserRepository) FindByID(ctx context.Context, id uint) (*model.User, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*entities.User), args.Error(1)
+	return args.Get(0).(*model.User), args.Error(1)
 }
 
-func (m *MockUserRepository) FindByEmail(ctx context.Context, email string) (*entities.User, error) {
+func (m *MockUserRepository) FindByEmail(ctx context.Context, email string) (*model.User, error) {
 	args := m.Called(ctx, email)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*entities.User), args.Error(1)
+	return args.Get(0).(*model.User), args.Error(1)
 }
 
-func (m *MockUserRepository) Create(ctx context.Context, user *entities.User) error {
+func (m *MockUserRepository) Create(ctx context.Context, user *model.User) error {
 	args := m.Called(ctx, user)
 	return args.Error(0)
 }
 
-func (m *MockUserRepository) Update(ctx context.Context, user *entities.User) error {
+func (m *MockUserRepository) Update(ctx context.Context, user *model.User) error {
 	args := m.Called(ctx, user)
 	return args.Error(0)
 }
@@ -57,7 +57,7 @@ func TestGetAllUsers(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 
 	// Create sample users
-	users := []entities.User{
+	users := []model.User{
 		{ID: 1, Name: "User 1", Email: "user1@example.com", Role: "user"},
 		{ID: 2, Name: "User 2", Email: "user2@example.com", Role: "admin"},
 	}
@@ -83,7 +83,7 @@ func TestGetAllUsers(t *testing.T) {
 
 func TestGetUserByID(t *testing.T) {
 	// Create sample user
-	user := &entities.User{
+	user := &model.User{
 		ID:     1,
 		Name:   "John Doe",
 		Email:  "john@example.com",
@@ -95,7 +95,7 @@ func TestGetUserByID(t *testing.T) {
 	testCases := []struct {
 		name          string
 		id            uint
-		mockReturn    *entities.User
+		mockReturn    *model.User
 		mockError     error
 		expectedError bool
 	}{
@@ -158,7 +158,7 @@ func TestCreateUser(t *testing.T) {
 	mockRepo := new(MockUserRepository)
 
 	// Create sample user input
-	userInput := entities.UserCreate{
+	userInput := model.UserCreate{
 		Name:     "New User",
 		Email:    "newuser@example.com",
 		Password: "password123",
@@ -166,8 +166,8 @@ func TestCreateUser(t *testing.T) {
 	}
 
 	// Capture the created user for validation
-	var capturedUser *entities.User
-	mockRepo.On("Create", mock.Anything, mock.MatchedBy(func(u *entities.User) bool {
+	var capturedUser *model.User
+	mockRepo.On("Create", mock.Anything, mock.MatchedBy(func(u *model.User) bool {
 		capturedUser = u
 		return u.Name == userInput.Name && u.Email == userInput.Email
 	})).Return(nil)

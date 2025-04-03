@@ -1,40 +1,40 @@
-package services
+package service
 
 import (
 	"context"
-	"github.com/ladderseeker/gin-crud-starter/internal/pkg/errors"
-	"github.com/ladderseeker/gin-crud-starter/internal/pkg/logger"
+	"github.com/ladderseeker/gin-crud-starter/internal/model"
+	"github.com/ladderseeker/gin-crud-starter/pkg/errors"
+	"github.com/ladderseeker/gin-crud-starter/pkg/logger"
 	"time"
 
-	"github.com/ladderseeker/gin-crud-starter/internal/domain/entities"
-	"github.com/ladderseeker/gin-crud-starter/internal/domain/repositories"
+	"github.com/ladderseeker/gin-crud-starter/internal/repository"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // UserService defines the interface for user service
 type UserService interface {
-	GetAllUsers(ctx context.Context) ([]entities.UserResponse, error)
-	GetUserByID(ctx context.Context, id uint) (*entities.UserResponse, error)
-	CreateUser(ctx context.Context, input entities.UserCreate) (*entities.UserResponse, error)
-	UpdateUser(ctx context.Context, id uint, input entities.UserUpdate) (*entities.UserResponse, error)
+	GetAllUsers(ctx context.Context) ([]model.UserResponse, error)
+	GetUserByID(ctx context.Context, id uint) (*model.UserResponse, error)
+	CreateUser(ctx context.Context, input model.UserCreate) (*model.UserResponse, error)
+	UpdateUser(ctx context.Context, id uint, input model.UserUpdate) (*model.UserResponse, error)
 	DeleteUser(ctx context.Context, id uint) error
 }
 
-// userService implements the UserService interface
-type userService struct {
-	userRepo repositories.UserRepository
+// userServiceImpl implements the UserService interface
+type userServiceImpl struct {
+	userRepo repository.UserRepository
 }
 
 // NewUserService creates a new user service
-func NewUserService(userRepo repositories.UserRepository) UserService {
-	return &userService{
+func NewUserService(userRepo repository.UserRepository) UserService {
+	return &userServiceImpl{
 		userRepo: userRepo,
 	}
 }
 
 // GetAllUsers retrieves all users
-func (s *userService) GetAllUsers(ctx context.Context) ([]entities.UserResponse, error) {
+func (s *userServiceImpl) GetAllUsers(ctx context.Context) ([]model.UserResponse, error) {
 	// Add timeout to context
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -46,7 +46,7 @@ func (s *userService) GetAllUsers(ctx context.Context) ([]entities.UserResponse,
 	}
 
 	// Convert users to response format
-	var response []entities.UserResponse
+	var response []model.UserResponse
 	for _, user := range users {
 		response = append(response, user.ToResponse())
 	}
@@ -55,7 +55,7 @@ func (s *userService) GetAllUsers(ctx context.Context) ([]entities.UserResponse,
 }
 
 // GetUserByID retrieves a user by ID
-func (s *userService) GetUserByID(ctx context.Context, id uint) (*entities.UserResponse, error) {
+func (s *userServiceImpl) GetUserByID(ctx context.Context, id uint) (*model.UserResponse, error) {
 	// Add timeout to context
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -71,7 +71,7 @@ func (s *userService) GetUserByID(ctx context.Context, id uint) (*entities.UserR
 }
 
 // CreateUser creates a new user
-func (s *userService) CreateUser(ctx context.Context, input entities.UserCreate) (*entities.UserResponse, error) {
+func (s *userServiceImpl) CreateUser(ctx context.Context, input model.UserCreate) (*model.UserResponse, error) {
 	// Add timeout to context
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -84,7 +84,7 @@ func (s *userService) CreateUser(ctx context.Context, input entities.UserCreate)
 	}
 
 	// Create user entity
-	user := &entities.User{
+	user := &model.User{
 		Name:     input.Name,
 		Email:    input.Email,
 		Password: string(hashedPassword),
@@ -108,7 +108,7 @@ func (s *userService) CreateUser(ctx context.Context, input entities.UserCreate)
 }
 
 // UpdateUser updates a user
-func (s *userService) UpdateUser(ctx context.Context, id uint, input entities.UserUpdate) (*entities.UserResponse, error) {
+func (s *userServiceImpl) UpdateUser(ctx context.Context, id uint, input model.UserUpdate) (*model.UserResponse, error) {
 	// Add timeout to context
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -153,7 +153,7 @@ func (s *userService) UpdateUser(ctx context.Context, id uint, input entities.Us
 }
 
 // DeleteUser deletes a user
-func (s *userService) DeleteUser(ctx context.Context, id uint) error {
+func (s *userServiceImpl) DeleteUser(ctx context.Context, id uint) error {
 	// Add timeout to context
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()

@@ -1,31 +1,31 @@
-package controllers
+package v1
 
 import (
 	stderrors "errors"
+	"github.com/ladderseeker/gin-crud-starter/internal/model"
+	"github.com/ladderseeker/gin-crud-starter/internal/service"
+	apperrors "github.com/ladderseeker/gin-crud-starter/pkg/errors"
+	"github.com/ladderseeker/gin-crud-starter/pkg/logger"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ladderseeker/gin-crud-starter/internal/domain/entities"
-	"github.com/ladderseeker/gin-crud-starter/internal/domain/services"
-	apperrors "github.com/ladderseeker/gin-crud-starter/internal/pkg/errors"
-	"github.com/ladderseeker/gin-crud-starter/internal/pkg/logger"
 	"go.uber.org/zap"
 )
 
 // UserController handles HTTP requests for users
 type UserController struct {
-	userService services.UserService
+	userService service.UserService
 }
 
 // NewUserController creates a new user controller
-func NewUserController(userService services.UserService) *UserController {
+func NewUserController(userService service.UserService) *UserController {
 	return &UserController{
 		userService: userService,
 	}
 }
 
-// Register registers the routes for the user controller
+// Register registers the router for the user controller
 func (c *UserController) Register(router *gin.RouterGroup) {
 	users := router.Group("/users")
 	{
@@ -97,7 +97,7 @@ func (c *UserController) GetUserByID(ctx *gin.Context) {
 // @Failure 500 {object} errors.AppError
 // @Router /users [post]
 func (c *UserController) CreateUser(ctx *gin.Context) {
-	var input entities.UserCreate
+	var input model.UserCreate
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		logger.Error("Invalid input for creating user", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, apperrors.NewInvalidInputError("Invalid input", nil, err))
@@ -133,7 +133,7 @@ func (c *UserController) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	var input entities.UserUpdate
+	var input model.UserUpdate
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		logger.Error("Invalid input for updating user", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, apperrors.NewInvalidInputError("Invalid input", nil, err))

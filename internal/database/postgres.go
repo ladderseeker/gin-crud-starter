@@ -1,10 +1,10 @@
-package db
+package database
 
 import (
-	"github.com/ladderseeker/gin-crud-starter/internal/pkg/logger"
+	"github.com/ladderseeker/gin-crud-starter/pkg/logger"
 	"time"
 
-	"github.com/ladderseeker/gin-crud-starter/configs"
+	"github.com/ladderseeker/gin-crud-starter/config"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -12,7 +12,7 @@ import (
 )
 
 // NewPostgresDB establishes a connection to the database
-func NewPostgresDB(config *configs.DatabaseConfig) (*gorm.DB, error) {
+func NewPostgresDB(config *config.DatabaseConfig) (*gorm.DB, error) {
 	// Configure GORM
 	gormConfig := &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{

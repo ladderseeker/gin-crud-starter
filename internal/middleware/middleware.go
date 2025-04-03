@@ -2,12 +2,12 @@ package middleware
 
 import (
 	"bytes"
+	"github.com/ladderseeker/gin-crud-starter/pkg/logger"
 	"io"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/ladderseeker/gin-crud-starter/internal/pkg/logger"
 	"go.uber.org/zap"
 )
 

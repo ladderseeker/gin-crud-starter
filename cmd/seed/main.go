@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/ladderseeker/gin-crud-starter/internal/database"
+	"github.com/ladderseeker/gin-crud-starter/internal/model"
+	"github.com/ladderseeker/gin-crud-starter/pkg/logger"
 	"os"
 	"time"
 
-	"github.com/ladderseeker/gin-crud-starter/configs"
-	"github.com/ladderseeker/gin-crud-starter/internal/domain/entities"
-	"github.com/ladderseeker/gin-crud-starter/internal/pkg/db"
-	"github.com/ladderseeker/gin-crud-starter/internal/pkg/logger"
+	"github.com/ladderseeker/gin-crud-starter/config"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -26,7 +26,7 @@ type TestUser struct {
 
 func main() {
 	// Load configuration
-	config, err := configs.LoadConfig()
+	config, err := config.LoadConfig()
 	if err != nil {
 		fmt.Printf("Failed to load configuration: %v\n", err)
 		os.Exit(1)
@@ -37,7 +37,7 @@ func main() {
 	defer logger.GetLogger().Sync()
 
 	// Connect to database
-	database, err := db.NewPostgresDB(&config.Database)
+	database, err := database.NewPostgresDB(&config.Database)
 	if err != nil {
 		logger.Fatal("Failed to connect to database", zap.Error(err))
 	}
@@ -59,7 +59,7 @@ func main() {
 func autoMigrate(database *gorm.DB) error {
 	// List of entities to migrate
 	entities := []interface{}{
-		&entities.User{},
+		&model.User{},
 		// Add more entities here as needed
 	}
 
@@ -131,7 +131,7 @@ func seedTestData(database *gorm.DB) error {
 		}
 
 		// Create user
-		user := &entities.User{
+		user := &model.User{
 			Name:     u.Name,
 			Email:    u.Email,
 			Password: string(hashedPassword),

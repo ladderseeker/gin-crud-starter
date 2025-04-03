@@ -1,22 +1,19 @@
-package configs
+package config
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"os"
 	"strconv"
 	"time"
-
-	"github.com/joho/godotenv"
 )
 
-// Config holds all configuration for the application
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	Logging  LoggingConfig
 }
 
-// ServerConfig holds server related configuration
 type ServerConfig struct {
 	Port         string
 	ReadTimeout  time.Duration
@@ -24,7 +21,6 @@ type ServerConfig struct {
 	Mode         string
 }
 
-// DatabaseConfig holds database related configuration
 type DatabaseConfig struct {
 	Host     string
 	Port     string
@@ -34,17 +30,20 @@ type DatabaseConfig struct {
 	SSLMode  string
 }
 
-// LoggingConfig holds logging related configuration
+func (c *DatabaseConfig) GetDSN() string {
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		c.Host, c.Port, c.User, c.Password, c.DBName, c.SSLMode)
+}
+
 type LoggingConfig struct {
 	Level string
 }
 
-// LoadConfig loads the configuration from environment variables
 func LoadConfig() (*Config, error) {
-	// Load .env file if it exists
+	// Load .env if exist
 	_ = godotenv.Load()
 
-	config := &Config{
+	config := Config{
 		Server: ServerConfig{
 			Port:         getEnv("SERVER_PORT", "8080"),
 			ReadTimeout:  getEnvDuration("SERVER_READ_TIMEOUT", 10*time.Second),
@@ -64,16 +63,9 @@ func LoadConfig() (*Config, error) {
 		},
 	}
 
-	return config, nil
+	return &config, nil
 }
 
-// GetDSN returns the database connection string
-func (c *DatabaseConfig) GetDSN() string {
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		c.Host, c.Port, c.User, c.Password, c.DBName, c.SSLMode)
-}
-
-// Helper functions for working with environment variables
 func getEnv(key, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
